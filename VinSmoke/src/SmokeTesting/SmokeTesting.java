@@ -648,6 +648,24 @@ public class SmokeTesting {
 									UtilityFunctions.EnterStringOnFocus(sControlValue);
 									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									break;
+								case "EntercurrentDateonfocus": //@vinayak : code for entering current date on focus
+									UtilityFunctions.EnterCurrentdateOnFocus();
+									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
+									break;
+								case "EntercurrentDateplusonfocus": //@vinayak : code for entering current date on focus
+									UtilityFunctions.EnterCurrentdateplusOnFocus(sControlValue);
+									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
+									break;
+									//>>Vinayak : Tab on Focus
+								case "TabonFocus": //>>Keyword is added for Tab on Focus
+									UtilityFunctions.ClickTabonFocus();
+									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
+									break;
+									//>>Vinayak : Enter on Focus
+								case "ClicKEnteronFocus": //>>Keyword is added for clicking Enter on Focus
+									UtilityFunctions.ClickEntonFocus();
+									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
+									break;
 								case "UpdateExcel": // Update excel file
 									//EnterStringOnFocus(sControlValue);
 									//UpdateExcelFile(Constants.sFileName, sParameterSheet, sGetTextFromControl, 6, 13);

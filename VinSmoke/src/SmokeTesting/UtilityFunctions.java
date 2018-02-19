@@ -152,6 +152,92 @@ public class UtilityFunctions {
         }
     }
 
+    //>>Vinayak : Tab on Focus : Keyword is added for entering current date on Focus
+    public static void EnterCurrentdateOnFocus() {
+        try {
+            //wait - increase this wait period if required
+            Thread.sleep(1000);
+            
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			Calendar c = Calendar.getInstance();
+			c.setTime(new Date()); // Now use today date.
+			c.add(Calendar.DATE, 0); // Adding 0 days
+			String output = sdf.format(c.getTime());
+			System.out.println(output);
+			Robot rb = new Robot();
+            StringSelection currentdate = new StringSelection(output);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(currentdate, null);            
+            rb.keyPress(KeyEvent.VK_CONTROL);
+            rb.keyPress(KeyEvent.VK_V);
+            rb.keyRelease(KeyEvent.VK_V);
+            rb.keyRelease(KeyEvent.VK_CONTROL);
+            
+        } catch (Exception ex) {
+            System.out.println("Error in getting current date: " + ex.getMessage());
+        }
+    }
+    //>>Vinayak : Tab on Focus : Keyword is added for entering current date on Focus
+    public static void EnterCurrentdateplusOnFocus(String sText) {
+        try {
+            //wait - increase this wait period if required
+            Thread.sleep(1000);
+            int d = Integer.parseInt(sText);
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			Calendar c = Calendar.getInstance();
+			c.setTime(new Date()); // Now use today date.
+			c.add(Calendar.DATE, d); // Adding days from excel
+			String output = sdf.format(c.getTime());
+			System.out.println(output);
+			Robot rb = new Robot();
+            StringSelection currentdate = new StringSelection(output);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(currentdate, null);            
+            rb.keyPress(KeyEvent.VK_CONTROL);
+            rb.keyPress(KeyEvent.VK_V);
+            rb.keyRelease(KeyEvent.VK_V);
+            rb.keyRelease(KeyEvent.VK_CONTROL);
+            
+        } catch (Exception ex) {
+            System.out.println("Error in getting current date: " + ex.getMessage());
+        }
+    }
+    
+  //>>Vinayak : Tab on Focus : Keyword is added for Tab on Focus
+    public static void ClickTabonFocus() {
+        try {
+            //wait - increase this wait period if required
+            Thread.sleep(1000);
+           
+            //create robot for keyboard operations
+            Robot rb = new Robot();
+  
+            rb.keyPress(KeyEvent.VK_TAB);
+            rb.keyRelease(KeyEvent.VK_TAB);
+               
+            //wait
+            Thread.sleep(1000);
+        } catch (Exception ex) {
+            System.out.println("Error in Focus Thread: " + ex.getMessage());
+        }
+    }
+    //>>Vinayak : Enter on Focus : Keyword is added for click Enter on Focus
+    public static void ClickEntonFocus() {
+        try {
+            //wait - increase this wait period if required
+            Thread.sleep(5000);
+           
+            //create robot for keyboard operations
+            Robot rb = new Robot();
+  
+            rb.keyPress(KeyEvent.VK_ENTER);
+            rb.keyRelease(KeyEvent.VK_TAB);
+           
+            Thread.sleep(5000);
+        } catch (Exception ex) {
+            System.out.println("Error in Focus Thread: " + ex.getMessage());
+        }
+    }
+    
+    
     public static String readField(WebElement dropdown, String sSearchText) {
     	List<WebElement> options = dropdown.findElements(By.tagName("option"));
     	for (WebElement option : options) {
