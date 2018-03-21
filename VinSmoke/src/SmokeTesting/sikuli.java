@@ -1,5 +1,4 @@
 package SmokeTesting;
-
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -17,7 +16,7 @@ public class sikuli
 		{
 		case "Click" :
 			screen.click(pattern);
-			System.out.println("Click *");
+			System.out.println("In Click *");
 			break;
 		case "EnterPath" :
 			System.out.println("Enter");

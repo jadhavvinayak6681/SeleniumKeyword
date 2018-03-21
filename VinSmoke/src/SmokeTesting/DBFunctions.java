@@ -11,6 +11,7 @@ import java.sql.Statement;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 public class DBFunctions {
+
 	@SuppressWarnings("unused")
 	public static Connection OpenMSSQLConnection(String sDBConnectionString, String sSQLUser, String sSQLPassword) throws ClassNotFoundException, AWTException, InterruptedException {
 		Connection Conn = null;
@@ -37,38 +38,23 @@ public class DBFunctions {
 		try {
 			st = Conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, 
 					  ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs;
-			rs = st.executeQuery(sSQLQueryString);
-			System.out.println("Fired Query : " + sSQLQueryString);
-			if(!rs.wasNull()) {
+			boolean gotResults = st.execute(sSQLQueryString);
+			ResultSet rs = null;
+			if(!gotResults)
+			{
+				System.out.println("No results returned");
+			}
+			else
+			{
+				rs = st.getResultSet();
 				System.out.println("Results of the Query as Below : ");
 				while (rs.next()) {
 					System.out.println(rs.getString(sReturnField));
 					System.out.println(rs.getRow());
-				}
-			} else {
-				System.out.println("The Query fetched zero records...");
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public static void ExecuteUpdateQuery(Connection Conn,String sSQLQueryString) {
-		//String sReturnValue=null;
-		boolean bResults = true;
-		Statement st;
-		ResultSet rs;
-		try {
-			st = Conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, 
-					  ResultSet.CONCUR_READ_ONLY);
-			bResults = st.execute(sSQLQueryString);
-			if( !bResults) {
-				System.out.println("Fired Query : " + sSQLQueryString + " No resultset generated...");
-			} else {
-				rs = st.getResultSet();
-				System.out.println("Fired Query : " + sSQLQueryString + " Resultset generated...");
+			
+			System.out.println("Fired Query : " + sSQLQueryString);
+				System.out.println("The Query fetched zero records...");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -133,7 +119,7 @@ public class DBFunctions {
 		}
 	}
 
-	public static int ExecuteSpecificDatabaseQuery(Connection ConnDB, HSSFWorkbook wb, String sDatabaseQueriesSheet, String sControlValue, String sYesNo, String sSelectUpdate ) {
+	public static int ExecuteSpecificDatabaseQuery(Connection ConnDB, HSSFWorkbook wb, String sDatabaseQueriesSheet, String sControlValue, String sYesNo ) {
 		int iDBCount = 0;
 		String sSQLQueryString = ExcelFunctions.FindValueInExcelSheet(wb, sDatabaseQueriesSheet, 0, sControlValue, 2);
 		if(ExcelFunctions.FindValueInExcelSheet(wb, sDatabaseQueriesSheet, 0, sControlValue, 4).equals(Constants.CONDITION_YES)) {
@@ -150,11 +136,7 @@ public class DBFunctions {
 		}
 		if(ExcelFunctions.FindValueInExcelSheet(wb, sDatabaseQueriesSheet, 0, sControlValue, 1).equals(Constants.CONDITION_YES)) {
 			if( sYesNo.equals("YES")) {
-				if(sSelectUpdate.equals("SELECT")) {
-					DBFunctions.ExecuteQuery(ConnDB,sSQLQueryString,ExcelFunctions.FindValueInExcelSheet(wb, sDatabaseQueriesSheet, 0, sControlValue, 3));
-				} else {
-					DBFunctions.ExecuteUpdateQuery(ConnDB,sSQLQueryString);
-				}
+				DBFunctions.ExecuteQuery(ConnDB,sSQLQueryString,ExcelFunctions.FindValueInExcelSheet(wb, sDatabaseQueriesSheet, 0, sControlValue, 3));
 			} else {
 				iDBCount = DBFunctions.ExecuteQueryCount(ConnDB,sSQLQueryString,ExcelFunctions.FindValueInExcelSheet(wb, sDatabaseQueriesSheet, 0, sControlValue, 3));
 			}

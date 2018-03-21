@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="1" total="1" passed="0">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Default suite" duration-ms="20688" started-at="2018-03-14T12:47:37Z" finished-at="2018-03-14T12:47:58Z">
+    <groups>
+    </groups>
+    <test name="Default test" duration-ms="20688" started-at="2018-03-14T12:47:37Z" finished-at="2018-03-14T12:47:58Z">
+      <class name="ezjems.SmokeTestWinium">
+        <test-method status="PASS" signature="InitializeForTesting()[pri:0, instance:ezjems.SmokeTestWinium@ae45eb6]" name="InitializeForTesting" is-config="true" duration-ms="414" started-at="2018-03-14T18:17:37Z" finished-at="2018-03-14T18:17:38Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- InitializeForTesting -->
+        <test-method status="FAIL" signature="ProceedWithTesting()[pri:0, instance:ezjems.SmokeTestWinium@ae45eb6]" name="ProceedWithTesting" duration-ms="20234" started-at="2018-03-14T18:17:38Z" finished-at="2018-03-14T18:17:58Z">
+          <exception class="org.openqa.selenium.WebDriverException">
+            <message>
+              <![CDATA[Timed out waiting for driver server to start.
+Build info: version: '2.48.2', revision: '41bccdd', time: '2015-10-09 19:55:52'
+System info: host: 'SP01-LPT-139', ip: '192.168.56.1', os.name: 'Windows 7', os.arch: 'amd64', os.version: '6.1', java.version: '1.8.0_144'
+Driver info: driver.version: unknown]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[org.openqa.selenium.WebDriverException: Timed out waiting for driver server to start.
+Build info: version: '2.48.2', revision: '41bccdd', time: '2015-10-09 19:55:52'
+System info: host: 'SP01-LPT-139', ip: '192.168.56.1', os.name: 'Windows 7', os.arch: 'amd64', os.version: '6.1', java.version: '1.8.0_144'
+Driver info: driver.version: unknown
+	at org.openqa.selenium.remote.service.DriverService.waitUntilAvailable(DriverService.java:178)
+	at org.openqa.selenium.remote.service.DriverService.start(DriverService.java:166)
+	at ezjems.SmokeTestWinium.ProceedWithTesting(SmokeTestWinium.java:274)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:85)
+	at org.testng.internal.Invoker.invokeMethod(Invoker.java:639)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:821)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:1131)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:124)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:108)
+	at org.testng.TestRunner.privateRun(TestRunner.java:773)
+	at org.testng.TestRunner.run(TestRunner.java:623)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:357)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:352)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:310)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:259)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1185)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1110)
+	at org.testng.TestNG.run(TestNG.java:1018)
+	at org.testng.remote.AbstractRemoteTestNG.run(AbstractRemoteTestNG.java:126)
+	at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:152)
+	at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:57)
+Caused by: org.openqa.selenium.net.UrlChecker$TimeoutException: Timed out waiting for [http://localhost:9999/status] to be available after 20002 ms
+	at org.openqa.selenium.net.UrlChecker.waitUntilAvailable(UrlChecker.java:104)
+	at org.openqa.selenium.remote.service.DriverService.waitUntilAvailable(DriverService.java:175)
+	... 26 more
+Caused by: com.google.common.util.concurrent.UncheckedTimeoutException: java.util.concurrent.TimeoutException
+	at com.google.common.util.concurrent.SimpleTimeLimiter.callWithTimeout(SimpleTimeLimiter.java:143)
+	at org.openqa.selenium.net.UrlChecker.waitUntilAvailable(UrlChecker.java:79)
+	... 27 more
+Caused by: java.util.concurrent.TimeoutException
+	at java.util.concurrent.FutureTask.get(Unknown Source)
+	at com.google.common.util.concurrent.SimpleTimeLimiter.callWithTimeout(SimpleTimeLimiter.java:130)
+	... 28 more
+]]>
+            </full-stacktrace>
+          </exception> <!-- org.openqa.selenium.WebDriverException -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- ProceedWithTesting -->
+        <test-method status="PASS" signature="CloseAfterTesting()[pri:0, instance:ezjems.SmokeTestWinium@ae45eb6]" name="CloseAfterTesting" is-config="true" duration-ms="3" started-at="2018-03-14T18:17:58Z" finished-at="2018-03-14T18:17:58Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- CloseAfterTesting -->
+      </class> <!-- ezjems.SmokeTestWinium -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>

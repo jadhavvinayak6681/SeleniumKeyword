@@ -5,35 +5,42 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import javax.mail.MessagingException;
-import jxl.read.biff.BiffException;
-import org.apache.poi.hssf.usermodel.*;
+
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-import atu.testrecorder.exceptions.ATUTestRecorderException;
-import SmokeTesting.Constants;
-import java.sql.Connection;
+
+import jxl.read.biff.BiffException;
 
 public class SmokeTesting {
 	public static String baseURL,sIsVideoOn,sRecorderFilePath,RecorderFilePrefix,sHTMLReportsPath, sHTMLReportsPrefix,currentDate,sRunDate, sReportPath, sTimeOuts,sEnvironmentName,sStyleSheetPath;
 	public static String parentWindowHandle,sBrowserName,sControlToEnable,sAuthentication,sAuthenticateUser,sAuthenticatePassword,sScreenShotPath,sGetTextFromControl,sSplitDelimeter;
 	public static String sDBConnectionString,sSQLUser,sSQLPassword, sSQLQueryString, sSQLResult, sConnectToDatabase, sIsEMailOn;
 	public static String sDataSheet,sFunctionSheet, sUtilitiesSheet, sDriversSheet, sDatabaseSheet, sObjectRepositorySheet,sEnvironmentSetUpSheet,sEmailSetUpSheet,sDatabaseQueriesSheet,sExcelUpdateSheet, sRemoteEXESheet;
-	public static String sRemoteMachine;
+	public static String sRemoteMachine, PCDAno;
 	public static HSSFWorkbook wb, wbgen, wbwrite ; static HSSFSheet sh, shgen ;
 	public static Connection ConnDB;
 	public static int iTimeoutValue;
@@ -41,16 +48,14 @@ public class SmokeTesting {
 	public static File file;
 	public static WebDriver driver;
 	public static boolean bVideoStarted=false, bExceptionOccurred=false, bParentWindow=true, bCompareValues=false;
-	public static void main(String args[]) throws Exception 
+	 
+	public static void main(String args[]) throws Exception  
 	{
 		try 
 		{
-			SmokeTesting.InitializeForTesting();
-			
-			SmokeTesting.ProceedWithTesting();
-			
-			SmokeTesting.CloseAfterTesting();
-
+			InitializeForTesting();
+			ProceedWithTesting();
+			CloseAfterTesting();
 		} 
 		catch (FileNotFoundException e) 
 		{
@@ -61,6 +66,7 @@ public class SmokeTesting {
 		{
 				bExceptionOccurred = true;
 				e.printStackTrace();
+				
 		} 
 		catch (InterruptedException e) 
 		{
@@ -72,6 +78,7 @@ public class SmokeTesting {
 				bExceptionOccurred = true;
 				e.printStackTrace();
 		}
+		
 		if(bExceptionOccurred) 
 		{
 				if( bVideoStarted) 
@@ -83,7 +90,7 @@ public class SmokeTesting {
 	}
 
 	@BeforeTest
-	public static void InitializeForTesting() throws BiffException, ATUTestRecorderException, IOException {
+	public static void InitializeForTesting() throws BiffException, IOException {
 		// Work sheet having all the generic parameters
 		wbgen = ExcelFunctions.OpenExcelWorkBook(Constants.FILE_NAME);
 		Constants.FILE_NAME = ExcelFunctions.FindValueInExcelSheet(wbgen, Constants.APPLICATION_SHEET, 0, Constants.GET_THIS_ROW, 2); // Path for application datasheet
@@ -103,6 +110,12 @@ public class SmokeTesting {
 		sRemoteMachine = ExcelFunctions.FindValueInExcelSheet(wbgen, sRemoteEXESheet, 0, Constants.GET_THIS_ROW, 1 ); // Remote machine to be used
 		System.out.println("Opening Browser: "+sBrowserName);
 		driver = WebDriverFunctions.OpenWebDriver(wbgen, sDriversSheet, Constants.GET_THIS_ROW, sRemoteMachine); // Browser driver to be used (IE, Chrome). Default is Firefox
+		
+		DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
+		capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
+		driver.manage().deleteAllCookies();
+		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		
 		bVideoStarted = false;
 		bExceptionOccurred = false;
 		sIsVideoOn = ExcelFunctions.FindValueInExcelSheet(wbgen, sUtilitiesSheet, 0, "VideoRecorder", 1 ); // Parameter to get the status of Video Recorder
@@ -160,6 +173,8 @@ public class SmokeTesting {
 			}
 			baseURL = UtilityFunctions.AddParametersToTheURL(wb, baseURL, sEnvironmentSetUpSheet);
 			ReportFunctions.ReportHeader(bw, sStyleSheetPath, sDataSheet, sEnvironmentName, baseURL, sRunDate);
+			//driver.findElement(By.xpath("/html/body")).sendKeys(Keys.F12);
+			
 			for (int i = 1; i <= iRows;i++) { // For each test case in the control sheet
 				HSSFRow row = sh.getRow(i);
 				String sTestCaseName = row.getCell(0).getStringCellValue();
@@ -198,7 +213,6 @@ public class SmokeTesting {
 								}
 								String sEncrypt = ExcelFunctions.FindValueInExcelSheet(wb, sObjectRepositorySheet, 0, sControlName, 8); // check whether the data should be encrypted in the report
 								String sEncryptChr = ExcelFunctions.FindValueInExcelSheet(wb, sObjectRepositorySheet, 0, sControlName, 9); // get the encrypt character
-								driver.manage().timeouts().implicitlyWait(iTimeoutValue, TimeUnit.SECONDS);
 								switch (sKeyword) {
 								case "BrowserReLaunch": // Closing the browser
 									driver.manage().deleteAllCookies();
@@ -213,7 +227,7 @@ public class SmokeTesting {
 									sGetTextFromControl = LocatorFunctions.ControlToGetTextFromAttributes(driver,sLocatorType,sIdentification, sSequenceStr);
 									sExpectedValue = UtilityFunctions.ToShowEncryptValueOrNot(sEncrypt, sExpectedValue, sEncryptChr, sGetTextFromControl, sControlValue);
 									break;
-								//@Vinayak : To get partial text as per position on string and update excel, position is to be on excel sheet Column mapping Sequence column
+									//@Vinayak : To get partial text as per position on string and update excel, position is to be on excel sheet Column mapping Sequence column
 								case "GetPartialText": // Get the Partial text from string as per location in string
 									sGetTextFromControl = LocatorFunctions.ControlToGetPartialTextFrom(driver,sLocatorType,sIdentification,sSequenceint);
 									sExpectedValue = UtilityFunctions.ToShowEncryptValueOrNot(sEncrypt, sExpectedValue, sEncryptChr, sGetTextFromControl, sControlValue);
@@ -240,8 +254,11 @@ public class SmokeTesting {
 									break;
 								}
 								ReportFunctions.ReportTestCaseDetails(bw, iTestCaseSteps, sTestCaseSteps, sExpectedValue);
-								driver.manage().timeouts().implicitlyWait(iTimeoutValue, TimeUnit.SECONDS);
+//								driver.manage().timeouts().implicitlyWait(iTimeoutValue, TimeUnit.SECONDS);
+								try
+								{
 								switch (sKeyword) {
+								
 								case "BrowserReLaunch": // re-launching the browser
 								case "Application": // Opens Application 
 									if(sKeyword.equals("BrowserReLaunch")) {
@@ -255,7 +272,7 @@ public class SmokeTesting {
 											UtilityFunctions.WindowsAuthenticationlogin(sAuthenticateUser,sAuthenticatePassword);
 										}
 									}
-									driver.manage().window().maximize();
+									//driver.manage().window().maximize();
 									ReportFunctions.ReportTestCaseResult(bw,Constants._PASS);
 									break;
 								case "URLLaunch": // URL launch after logging into the application specific to certain navigations
@@ -278,10 +295,6 @@ public class SmokeTesting {
 										System.out.println(Constants.NO_EMAILS_FOUND);
 									}
 									break;
-								case "sikuli": // executing sikuli code
-							         sikuli.siluliMethod(driver, sLocatorType, sIdentification,sControlValue.trim());
-							         ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
-							         break;
 								case "LaunchURL": // Launching a defined URL
 									String sLaunchURL = ExcelFunctions.FindValueInExcelSheet(wb, sEmailSetUpSheet, 0, sIdentification, 6);
 									driver.get(sLaunchURL);
@@ -292,7 +305,7 @@ public class SmokeTesting {
 								case "UploadFile":
 									//open upload window
 									LocatorFunctions.ControlToUploadFile(driver, sLocatorType, sIdentification, sControlValue);
-									if (UtilityFunctions.IsFileOrDirectoryExist(sControlValue, Constants._FOLDER)) {
+									if (UtilityFunctions.IsFileOrDirectoryExist(sControlValue, "D")) {
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									} else {
 										ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
@@ -302,6 +315,10 @@ public class SmokeTesting {
 								case "ClearData": // Clearing data from a field 
 								case "FileOpen": // populating data into Input fields like upload files and read only fields 
 									LocatorFunctions.ControlToUse(driver, sLocatorType,sIdentification,sControlValue,sKeyword);
+									ReportFunctions.ReportTestCaseResult(bw, Constants._PASSFAIL);
+									break;
+								case "InputRandom": // @Vinayak : Generate Random number through code and Inputting generated Random number in text filed
+									LocatorFunctions.ControlforRandom(driver, sLocatorType,sIdentification,sControlValue,sKeyword);
 									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									break;
 								case "InputInFrame":
@@ -345,30 +362,19 @@ public class SmokeTesting {
 									LocatorFunctions.ControlToMoveDownAndClick(driver, sLocatorType, sIdentification, sControlValue);									
 									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									break;
-								case "SelectDate": //
-									LocatorFunctions.ControlToSelectADate(driver, sLocatorType, sIdentification, sControlValue);
-									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
-									break;
-								case "KEYTAB": // Key press Tab 
-								case "KEYENTER": // Key press Enter
-								case "KEYF1": // Key press F1 
+								case "KEYTAB": // Tab Key press Tab 
 								case "KEYF2": // Key press F2 
-								case "KEYF3": // Key press F3 
-								case "KEYF4": // Key press F4
-								case "KEYF5": // Key press F5 
-								case "KEYF6": // Key press F6 
-								case "KEYF7": // Key press F7 
-								case "KEYF8": // Key press F8 
-								case "KEYF9": // Key press F9 
-								case "KEYF10": // Key press F10 
-								case "KEYF11": // Key press F11 
-								case "KEYF12": // Key press F12 
+								case "KEYENTER": // Tab Key press Enter
 									LocatorFunctions.ControlKeyPress(driver, sLocatorType,sIdentification,sControlValue,sKeyword);
 									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									break;
 								case "WaitFor": // Wait for seconds
 									Thread.sleep(Integer.parseInt(sControlValue));
 									ReportFunctions.ReportTestCaseResult(bw, " ");
+									break;
+								case "sikuli": // executing sikuli code
+									sikuli.siluliMethod(driver, sLocatorType, sIdentification,sControlValue.trim());
+									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									break;
 								case "DisplayValue": // Wait for seconds
 									ReportFunctions.ReportTestCaseResult(bw, " ");
@@ -388,10 +394,20 @@ public class SmokeTesting {
 									ReportFunctions.ReportTestCaseResult(bw, " ");
 									break;
 								case "AlertOk": // Clicking OK on alerts if exists
+										try
+										{
 									Thread.sleep(5000);
+									Alert alert = driver.switchTo().alert();
+							        alert.accept();
 									UtilityFunctions.checkAlert(driver);
 									Thread.sleep(2000);
 									break;
+										}
+										catch (UnhandledAlertException ex)
+										{
+											Alert alert = driver.switchTo().alert();
+									        alert.accept();
+										}
 								case "AlertCancel": // Clicking CANCEL on alerts if exists
 									Thread.sleep(5000);
 									UtilityFunctions.checkAlertToCancel(driver);
@@ -401,26 +417,27 @@ public class SmokeTesting {
 									String sTitle = driver.getTitle().trim();
 									//if (driver.getTitle().equals(sExpectedValue.trim()) == false) {
 									if (sTitle.equals(sControlValue.trim())) {
-										System.out.println(Constants._EXPECTED + sExpectedValue + Constants._FOUND);
+										System.out.println("Expected Text '" + sExpectedValue + "' Found...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									} else {
 										String sActVerifyTitle = UtilityFunctions.captureScreen(driver,sScreenShotPath);
-										System.out.println(Constants._EXPECTED + sExpectedValue + Constants._NOTFOUND);
+										System.out.println("Expected Text '" + sExpectedValue + "' Not Found...: ");
 										System.out.println(sActVerifyTitle);
 										ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
 									}
 									break;
 								case "Verify": // Verifying a particular text value which is present
 									if (LocatorFunctions.CheckTextPresent(driver, sLocatorType,sIdentification,sControlValue.trim()) == false) {
-										String sActVerify = UtilityFunctions.captureScreen(driver,sScreenShotPath);
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._NOTFOUND);
-										System.out.println(sActVerify);
+										//String sActVerify = UtilityFunctions.captureScreen(driver,sScreenShotPath);
+										System.out.println("Expected Text '" + sControlValue + "' Not Found...: ");
+										//System.out.println(sActVerify);
 										ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
 									} else {
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._FOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Found...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									}
 									break;
+									//@Vinayak : Verifying value of 
 								case "Verifyvalue": // Verifying a value
 									driver.manage().timeouts().implicitlyWait(iTimeoutValue, TimeUnit.SECONDS);
 									//Thread.sleep(5000);
@@ -436,28 +453,28 @@ public class SmokeTesting {
 								case "VerifyFail": // Verifying a particular text value which is not present
 									if (LocatorFunctions.CheckTextPresent(driver, sLocatorType,sIdentification,sControlValue.trim()) == false) {
 										String sActVerify = UtilityFunctions.captureScreen(driver,sScreenShotPath);
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._NOTFOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Not Found...: ");
 										System.out.println(sActVerify);
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									} else {
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._FOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Found...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
 									}
 									break;
 								case "VerifyPartial": // Verifying a Partial value
 									if (LocatorFunctions.CheckPartialTextPresent(driver, sLocatorType,sIdentification,sControlValue.trim()) == false) {
 										String sActVerify = UtilityFunctions.captureScreen(driver,sScreenShotPath);
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._NOTFOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Not Found...: ");
 										System.out.println(sActVerify);
 										ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
 									} else {
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._FOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Found...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									}
 									break;
 								case "VerifyAndClick": // Verifying a particular text value which is present
 									if (LocatorFunctions.CheckTextPresent(driver, sLocatorType,sIdentification,sControlValue) == true) {
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._FOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Found...: ");
 										LocatorFunctions.ControlToUse(driver, sLocatorType, sIdentification, true);
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									}
@@ -465,25 +482,30 @@ public class SmokeTesting {
 								case "Assert": // Assert a value, if found stop testing
 									if (LocatorFunctions.CheckTextPresent(driver, sLocatorType,sIdentification,sControlValue.trim()) == false) {
 										String sActVerify = UtilityFunctions.captureScreen(driver,sScreenShotPath);
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._NOTFOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Not Found...: ");
 										System.out.println(sActVerify);
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									} else {
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._FOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Found...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
-										SmokeTesting.CloseAfterTesting();
+									//	SmokeTesting.CloseAfterTesting();
 									}
 									break;
 								case "VerifyText": // Verify a text anywhere on a web page
 									if (UtilityFunctions.VerifyTextOnPage(driver, sControlValue)) {
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._FOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Found...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									}else {
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._NOTFOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Not Found...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
 									};
 									break;
 								case "VerifyEnabled": // Verify that an element is enabled or not on a web page
+									//@SuppressWarnings("unused")
+									//WebElement asd = driver.findElement(By.xpath("//label[text()= 'Proposal Number:']"));
+									 //(By.xpath("//label[text()= 'Proposal Number:']"));
+									//WebElement asdf = driver.findElement(By.xpath(sIdentification));
+									//asdf.isEnabled();
 									if (LocatorFunctions.ControlToVerifyIsEnable(driver, sLocatorType,sIdentification) == true) {
 										System.out.println("Expected Element '" + sControlName + "' is Enabled...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
@@ -503,11 +525,11 @@ public class SmokeTesting {
 									break;
 								case "AssertText": // Assert a text anywhere on a web page and stop testing if fails
 									if (UtilityFunctions.VerifyTextOnPage(driver, sControlValue)) {
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._FOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Found...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
-										SmokeTesting.CloseAfterTesting();
+										//SmokeTesting.CloseAfterTesting();
 									}else {
-										System.out.println(Constants._EXPECTED + sControlValue + Constants._NOTFOUND);
+										System.out.println("Expected Text '" + sControlValue + "' Not Found...: ");
 										ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									}
 									break;
@@ -633,7 +655,7 @@ public class SmokeTesting {
 												try {
 													wb = ExcelFunctions.OpenExcelWorkBook(Constants.FILE_NAME);
 												} catch (BiffException e) {
-										      	  	System.out.println(Constants._ERROR_IN_OPENING_WB + Constants.FILE_NAME);
+										      	  	System.out.println("Error Opening Workbook : "+ Constants.FILE_NAME);
 													e.printStackTrace();
 												}
 											}
@@ -656,6 +678,13 @@ public class SmokeTesting {
 									UtilityFunctions.EnterCurrentdateplusOnFocus(sControlValue);
 									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
 									break;
+									// @Vianayak : Code to take current date and add number of days from excel and enter in date field ddmmyyyy
+									//Note : for current date enter 0 in excel sheet
+								case "EntercurrentDateplusonfield": //@vinayak : code for entering current date on field
+									driver.manage().timeouts().implicitlyWait(iTimeoutValue, TimeUnit.SECONDS);
+									LocatorFunctions.Enterdate(driver, sLocatorType,sIdentification,sControlValue);
+									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
+									break;
 									//>>Vinayak : Tab on Focus
 								case "TabonFocus": //>>Keyword is added for Tab on Focus
 									UtilityFunctions.ClickTabonFocus();
@@ -673,6 +702,8 @@ public class SmokeTesting {
 									//int iNoOfExcelUpdates = Integer.parseInt(ExcelFunctions.FindValueInExcelSheet(wb, sExcelUpdateSheet, 0, sUpdateSheet, 1)); // get the sheet name to update
 									//int iFoundInRow = ExcelFunctions.FindRowNoOfValueInExcelSheet(wb, sExcelUpdateSheet, 0, sUpdateSheet, 1 );
 									
+									
+									
 									int iUpdateRow = Integer.parseInt(ExcelFunctions.FindValueInExcelSheet(wb, sObjectRepositorySheet, 0, sControlName, 6)); // get the Row Number to update
 									int iUpdateColumn = Integer.parseInt(ExcelFunctions.FindValueInExcelSheet(wb, sObjectRepositorySheet, 0, sControlName, 7)); // get the Column Number to update
 									ExcelFunctions.UpdateExcelFile(Constants.FILE_NAME, sUpdateSheet, sGetTextFromControl, iUpdateRow, iUpdateColumn);
@@ -685,7 +716,7 @@ public class SmokeTesting {
 									try {
 										wb = ExcelFunctions.OpenExcelWorkBook(Constants.FILE_NAME);
 									} catch (BiffException e) {
-							      	  	System.out.println(Constants._ERROR_IN_OPENING_WB + Constants.FILE_NAME);
+							      	  	System.out.println("Error Opening Workbook : "+ Constants.FILE_NAME);
 										e.printStackTrace();
 									}
 									ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
@@ -704,14 +735,14 @@ public class SmokeTesting {
 									int iDBCount = 0;
 									boolean bIsPass = false; 
 									if(sConnectToDatabase.equals(Constants.CONDITION_YES)) {
-										iDBCount = DBFunctions.ExecuteSpecificDatabaseQuery(ConnDB, wb, sDatabaseQueriesSheet,sControlValue,"NO","SELECT" );
+										iDBCount = DBFunctions.ExecuteSpecificDatabaseQuery(ConnDB, wb, sDatabaseQueriesSheet,sControlValue,"NO" );
 										if(ExcelFunctions.FindValueInExcelSheet(wb, sDatabaseQueriesSheet, 0, sControlValue, 1).equals(Constants.CONDITION_YES)) {
 											iDBCount = DBFunctions.ExecuteQueryCount(ConnDB,sSQLQueryString,ExcelFunctions.FindValueInExcelSheet(wb, sDatabaseQueriesSheet, 0, sControlValue, 3));
 											Integer.toString(iDBCount);
 											ExcelFunctions.UpdateExcelFile(Constants.FILE_NAME, sDBUpdateSheet, Integer.toString(iDBCount), iDBUpdateRow, iDBUpdateColumn);
 											bIsPass = true;
 										} else {
-											System.out.println(sControlValue + Constants._QUERY_NOT_CONFIGURED);
+											System.out.println("Query "+ sControlValue +" is not configured to run...");
 										}
 									} else {
 										System.out.println(Constants.DB_NOT_CONFIFURED_MSG);
@@ -729,35 +760,7 @@ public class SmokeTesting {
 									}
 									break;
 								case "SelectTableRow": // Select a row from table
-									// Pick the locator from ColumnMapping Sheet Column 4 for the control to locate the element of the value to be searched
-									String sLocateString = ExcelFunctions.FindValueInExcelSheet(wb, sObjectRepositorySheet, 0, sControlName, 4);
-									// Pick the locator from ColumnMapping Sheet Column 5 for the control to locate the element of the table row to be selected
-									String sLocateToSelect = ExcelFunctions.FindValueInExcelSheet(wb, sObjectRepositorySheet, 0, sControlName, 5);
 									
-									List<WebElement> Table_Rows = LocatorFunctions.ControlToUseTableRowColumn(driver, sLocatorType, sIdentification);
-									int iTable_Rows = Table_Rows.size();
-									if(iTable_Rows == 0 ) {
-										ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
-									} else {
-										boolean bIsFound = false;
-									    for (int i0 = 1; i <= iTable_Rows; i++) 
-									    {
-									    	// Get the value on each table row on the specified column
-									    	String sCellValue = LocatorFunctions.ControlToGetTextFrom(driver,sLocatorType,sLocateString);
-									    	// if the column value matches with the searched string
-									    	if (sCellValue.equalsIgnoreCase(sControlValue)) 
-									    	{
-									    		// Select the row and exit the for loop
-									    		LocatorFunctions.ControlToUse(driver, sLocatorType, sLocateToSelect, true);
-												ReportFunctions.ReportTestCaseResult(bw, Constants._PASS);
-												bIsFound = true;
-									    		break;
-									    	}
-									    }
-									    if( !bIsFound) {
-											ReportFunctions.ReportTestCaseResult(bw, Constants._FAIL);
-									    }
-									}
 									//WebElement Wbtable = ControlToUseTable(driver, sIdentificationType, sIdentification);
 									
 									break;
@@ -778,14 +781,7 @@ public class SmokeTesting {
 									break;
 								case "ExecuteDBQuery": //ExecuteQueryCount
 									if(sConnectToDatabase.equals(Constants.CONDITION_YES)) {
-										DBFunctions.ExecuteSpecificDatabaseQuery(ConnDB, wb, sDatabaseQueriesSheet,sControlValue,"YES","SELECT" );
-									} else {
-										System.out.println(Constants.DB_NOT_CONFIFURED_MSG);
-									}
-									break;
-								case "ExecuteDBUpdateQuery": //Execute Update Query
-									if(sConnectToDatabase.equals(Constants.CONDITION_YES)) {
-										DBFunctions.ExecuteSpecificDatabaseQuery(ConnDB, wb, sDatabaseQueriesSheet,sControlValue,"YES","UPDATE" );
+										DBFunctions.ExecuteSpecificDatabaseQuery(ConnDB, wb, sDatabaseQueriesSheet,sControlValue,"YES" );
 									} else {
 										System.out.println(Constants.DB_NOT_CONFIFURED_MSG);
 									}
@@ -799,7 +795,7 @@ public class SmokeTesting {
 									break;									
 								case "CompareAppDB": //ExecuteQueryCount
 									if(sConnectToDatabase.equals(Constants.CONDITION_YES)) {
-										DBFunctions.ExecuteSpecificDatabaseQuery(ConnDB, wb, sDatabaseQueriesSheet,sControlValue,"YES","SELECT" );
+										DBFunctions.ExecuteSpecificDatabaseQuery(ConnDB, wb, sDatabaseQueriesSheet,sControlValue,"YES" );
 									} else {
 										System.out.println(Constants.DB_NOT_CONFIFURED_MSG);
 									}
@@ -811,12 +807,19 @@ public class SmokeTesting {
 									Thread.sleep(3000);
 									driver.findElement(By.xpath("//li[@class='fp-tr-ca']/a")).click();
 									break;
+								
 								} // Case
+								}
+								catch (UnhandledAlertException ex)
+								{
+									Alert alert = driver.switchTo().alert();
+							        alert.accept();
+								}
 								iTestCaseSteps ++;
 							} // if
 							//*********************************
 						} // Second Loop
-						driver.manage().timeouts().implicitlyWait(iTimeoutValue, TimeUnit.SECONDS);
+						//driver.manage().timeouts().implicitlyWait(iTimeoutValue, TimeUnit.SECONDS);
 						Thread.sleep(3000);
 					} // Second If
 				}	// First If
@@ -844,21 +847,28 @@ public class SmokeTesting {
 		if(bExceptionOccurred) {
 			driver.close();
 		}
+		//driver.manage().deleteAllCookies();
+		//driver.close();
+		//driver.quit();
 	}
 	
 	@AfterTest
 	public static void CloseAfterTesting() throws Exception {
 		try {
 			ReportFunctions.ReportFooter(bw);
+			
+			//driver.manage().deleteAllCookies();
+			driver.close();
 			driver.quit();
 			try {
 				if(sIsEMailOn.equals(Constants.CONDITION_YES)) {
 					SendMail.execute(sEmailSetUpSheet, wb, sHTMLReportsPath,sHTMLReportsPrefix + currentDate + ".html",sSplitDelimeter);
 				}
 			} catch (Exception e) {
-	      	  	System.out.println(Constants._ERROR_SENDING_EMAIL);
+	      	  	System.out.println("Error occurred while sending Email");
 				e.printStackTrace();
 			}
+			
 			if( bVideoStarted) {
 				//GenericCode.StopVideoRecorder();
 				bVideoStarted = false;

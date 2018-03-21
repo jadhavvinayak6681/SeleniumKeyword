@@ -1,7 +1,7 @@
 package SmokeTesting;
 
 import java.io.File;
-import java.net.MalformedURLException;
+//import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -16,7 +16,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.Select;
+//import org.openqa.selenium.support.ui.Select;
 
 public class WebDriverFunctions {
 	@SuppressWarnings("unused")
@@ -84,9 +84,9 @@ public class WebDriverFunctions {
 			//driver = new RemoteWebDriver(url,capabilities);
 			break;
 		case 5:
-			sDriverName = "IEEdge";
+			sDriverName = "IEEdge";/*
 			capabilities = DesiredCapabilities.edge();
-			driver = new EdgeDriver(capabilities);
+			driver = new EdgeDriver(capabilities);*/
 			//driver = new RemoteWebDriver(url,capabilities);
 			break;
 		}

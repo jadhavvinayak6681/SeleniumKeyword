@@ -8,7 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +51,21 @@ public class UtilityFunctions {
 	       // wait.until(ExpectedConditions.alertIsPresent());
 	        Alert alert = driver.switchTo().alert();
 	        alert.accept();
+	        
+	        String parentWindow = driver.getWindowHandle();
+	        Set<String> windowHandles = driver.getWindowHandles();
+	        Iterator<String> iterator = windowHandles.iterator();
+	        while (iterator.hasNext()) {
+	           String handle = iterator.next();
+	           if (!handle.contains(parentWindow)) {
+	                // Switch to popup and close it
+	                driver.switchTo().window(handle);
+	                // Perform required action in popup
+	           }
+	        }
+	        // Switching back to parent window
+	        driver.switchTo().window(parentWindow);
+	        
 	    } catch (Exception e) {
 	        //exception handling
 	    	System.out.println("No Alerts were found.");
@@ -67,24 +84,44 @@ public class UtilityFunctions {
 	    }
 	}
 
-	public static WebDriver getHandleToWindow(WebDriver driver, String title){
+	public static WebDriver getHandleToWindow(WebDriver driver, String title)
+	{
+		String parent=driver.getWindowHandle();
+		Set<String>s1=driver.getWindowHandles();
+		Iterator<String> I1= s1.iterator();
+		while(I1.hasNext())
+		{
+		   String child_window=I1.next();
+		   if(!parent.equals(child_window))
+		   {
+			   	driver.switchTo().window("http://172.31.0.33/ - CDA - Internet Explorer");
+			   	System.out.println(driver.switchTo().window(child_window).getTitle());
+			   	driver.close();
+		   }
+		}
 
         WebDriver popup = null;
         //Set<String> windowIterator = WebDriverInitialize.getDriver().getWindowHandles();
-        Set<String> windowIterator = driver.getWindowHandles();
-        System.err.println("No of windows :  " + windowIterator.size());
-        for (String s : windowIterator) {
+        String windowIterator = driver.getWindowHandle();
+        Set<String> handles = driver.getWindowHandles();
+        System.err.println("No of windows :  " + handles.size());
+        
+        for(String s : driver.getWindowHandles()) 
+        {
+        	if(!s.equals(windowIterator))
+        	{
         	String windowHandle = s; 
         	//popup = WebDriverInitialize.getDriver().switchTo().window(windowHandle);
-        	popup = driver.switchTo().window(windowHandle);
-        	System.out.println("Window Title : " + popup.getTitle());
-        	System.out.println("Window Url : " + popup.getCurrentUrl());
-        	if (popup.getTitle().equals(title) ){
-        		System.out.println("Selected Window Title : " + popup.getTitle());
+        	driver.switchTo().window(windowHandle);
+        	System.out.println("Window Title : " + driver.getTitle());
+        	System.out.println("Window Url : " + driver.getCurrentUrl());
+        	if (driver.getTitle().equals(title) ){
+        		System.out.println("Selected Window Title : " + driver.getTitle());
         		return popup;
         	}
+        	}
         }
-        System.out.println("Window Title :" + popup.getTitle());
+        System.out.println("Window Title :" + driver.getTitle());
         System.out.println();
         return popup;
     }	
@@ -151,8 +188,7 @@ public class UtilityFunctions {
             System.out.println("Error in Focus Thread: " + ex.getMessage());
         }
     }
-
-    //>>Vinayak : Tab on Focus : Keyword is added for entering current date on Focus
+  //>>Vinayak : Tab on Focus : Keyword is added for entering current date on Focus
     public static void EnterCurrentdateOnFocus() {
         try {
             //wait - increase this wait period if required
@@ -236,8 +272,6 @@ public class UtilityFunctions {
             System.out.println("Error in Focus Thread: " + ex.getMessage());
         }
     }
-    
-    
     public static String readField(WebElement dropdown, String sSearchText) {
     	List<WebElement> options = dropdown.findElements(By.tagName("option"));
     	for (WebElement option : options) {
@@ -392,14 +426,22 @@ public class UtilityFunctions {
 		}		
 	}
 
-	public static boolean IsFileOrDirectoryExist(String sPath,String sFolderOrFile) {
+	public static boolean IsFileOrDirectoryExist(String sPath,String sDirectoryOrFile) {
 		boolean bFound = true;
 		File file = new File(sPath);
 		if (!file.exists()) {
-            System.out.print(sFolderOrFile + " not found...");
-            bFound = false;
+			switch (sDirectoryOrFile) {
+			case "D":
+	            System.out.print("Folder not found...");
+	            bFound = false;
+				break;
+			case "F":
+	            System.out.print("File not found...");
+	            bFound = false;
+				break;
+			}
 		}
 		return bFound;
 	}
-
+	
 }
