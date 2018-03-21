@@ -1,0 +1,301 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.splus.testing.automation</groupId>
+	<artifactId>splus-testing-automation</artifactId>
+	<version>1</version>
+	<packaging>jar</packaging>
+
+	<name>splus-testing-automation</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8 </project.build.sourceEncoding>
+	</properties>
+
+	<!-- Repositories for zephyr cloud -->
+	<repositories>
+		<repository>
+			<id>atlassian-public1</id>
+			<url>https://maven.atlassian.com/repository/public</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+		</repository>
+		<repository>
+			<id>atlassian-public2</id>
+			<url>https://m2proxy.atlassian.com/repository/public</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+		</repository>
+		<repository>
+			<id>atlassian-public3</id>
+			<url>https://maven.atlassian.com/content/groups/public</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>com.splus.testing.automation.SmokeTesting</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20171018</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.2-atlassian-1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>2.16</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+			<version>2.16</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-rest-java-client-core</artifactId>
+			<version>2.0.0-m30</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>14.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.10</version>
+		</dependency>
+		<!-- <dependency> <groupId>com.atlassian.jira</groupId> <artifactId>jira-api</artifactId> 
+			<version>7.1.1</version> <scope>provided</scope> <exclusions> <exclusion> 
+			<groupId>com.atlassian.util.concurrent</groupId> <artifactId>atlassian-util-concurrent</artifactId> 
+			</exclusion> <exclusion> <groupId>commons-httpclient</groupId> <artifactId>commons-httpclient</artifactId> 
+			</exclusion> </exclusions> </dependency> -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.connect</groupId>
+			<artifactId>ac-play-java_2.10</artifactId>
+			<version>0.10.1</version>
+			<exclusions>
+				<!-- <exclusion> <groupId>com.atlassian.fugue</groupId> <artifactId>fugue</artifactId> 
+					</exclusion> <exclusion> <groupId>com.atlassian.jwt</groupId> <artifactId>jwt-api</artifactId> 
+					</exclusion> <exclusion> <groupId>com.atlassian.jwt</groupId> <artifactId>jwt-core</artifactId> 
+					</exclusion> <exclusion> <groupId>com.google.guava</groupId> <artifactId>guava</artifactId> 
+					</exclusion> <exclusion> <groupId>commons-lang</groupId> <artifactId>commons-lang</artifactId> 
+					</exclusion> <exclusion> <groupId>net.oauth.core</groupId> <artifactId>oauth</artifactId> 
+					</exclusion> -->
+				<exclusion>
+					<groupId>com.typesafe.play</groupId>
+					<artifactId>filters-helpers_2.10</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.typesafe.play</groupId>
+					<artifactId>play-cache_2.10</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.typesafe.play</groupId>
+					<artifactId>play-java-jdbc_2.10</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.typesafe.play</groupId>
+					<artifactId>play-java-jpa_2.10</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.typesafe.play</groupId>
+					<artifactId>play-java_2.10</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.typesafe.play</groupId>
+					<artifactId>play_2.10</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+					<artifactId>commons-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk16</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-entitymanager</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.scala-lang</groupId>
+					<artifactId>scala-library</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.typesafe.play</groupId>
+					<artifactId>play-test_2.10</artifactId>
+				</exclusion>
+
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-all</artifactId>
+				</exclusion>
+
+				<exclusion>
+					<groupId>org.mockito</groupId>
+					<artifactId>mockito-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.19</version>
+		</dependency>
+		<!-- Need to install into local maven repository first refer LoadLocalJarIntoMavenLocalRepository.txt -->
+		<dependency>
+			<groupId>com.splus.testing.automation</groupId>
+			<artifactId>sqljdbc41</artifactId>
+			<version>1</version>
+		</dependency>
+		<!-- Need to install into local maven repository first refer LoadLocalJarIntoMavenLocalRepository.txt -->
+		<dependency>
+			<groupId>com.splus.testing.automation</groupId>
+			<artifactId>ATUTestRecorder</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-server -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-server</artifactId>
+			<version>2.53.1</version>
+		</dependency>
+		<!-- Need to install into local maven repository first refer LoadLocalJarIntoMavenLocalRepository.txt -->
+		<dependency>
+			<groupId>com.splus.testing.automation</groupId>
+			<artifactId>sikuli-java</artifactId>
+			<version>1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.10-FINAL</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jexcelapi</groupId>
+			<artifactId>jxl</artifactId>
+			<version>2.6.12</version>
+		</dependency>
+		<dependency>
+			<groupId>com.profesorfalken</groupId>
+			<artifactId>jPowerShell</artifactId>
+			<version>1.8</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.testng/testng -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.4</version>
+		</dependency>
+
+	</dependencies>
+</project>
