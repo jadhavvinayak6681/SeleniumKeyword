@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="1" passed="1">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Default suite" duration-ms="16390" started-at="2018-03-22T15:40:55Z" finished-at="2018-03-22T15:41:12Z">
+    <groups>
+    </groups>
+    <test name="Default test" duration-ms="16390" started-at="2018-03-22T15:40:55Z" finished-at="2018-03-22T15:41:12Z">
+      <class name="Test.Selenide.firsttest">
+        <test-method status="PASS" signature="usercansearch()[pri:0, instance:Test.Selenide.firsttest@46d56d67]" name="usercansearch" duration-ms="16358" started-at="2018-03-22T21:10:55Z" finished-at="2018-03-22T21:11:12Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- usercansearch -->
+      </class> <!-- Test.Selenide.firsttest -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>
